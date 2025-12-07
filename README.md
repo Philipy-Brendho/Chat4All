@@ -77,11 +77,34 @@ CLI / gRPC Stream
 
 ## **Executando o Projeto**
 
-### 1. Clone o repositório
+# Instalação e Configuração do Projeto
+
+Este projeto utiliza **Python**, com suporte a gRPC, FastAPI, Kafka, Cassandra, MinIO e ferramentas de observabilidade como Prometheus e OpenTelemetry.
+
+---
+
+## Pré-requisitos
+
+Antes de começar, verifique se você tem instalado em sua máquina:
+
+- Python **3.9 ou superior**
+- pip atualizado
+
+Atualize o pip com:
 
 ```bash
-git clone https://github.com/seu-repo/chat4all.git
-cd chat4all
+python -m pip install --upgrade pip
+````
+
+### 1. Clone o repositório e instale as dependências:
+
+```bash
+git clone https://github.com/Philipy-Brendho/Chat4All.git
+cd Chat4All
+````
+Instalando dependências(certifique de criar e ativar sua VENV):
+```bash
+pip install -r Chat/api/requirements.txt
 ````
 
 ### 2. Execute com Docker Compose
@@ -189,5 +212,6 @@ No Telegram:
 4. Será roteada para Instagram Mock
 5. Será retornado status em `chat-status`
 6. CLI / API verão atualização em tempo real
+
 
 ---
