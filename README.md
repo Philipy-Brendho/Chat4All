@@ -166,6 +166,11 @@ Usuário no Telegram → Connector → Kafka → RouterWorker → instagram-out 
 
 Ferramenta: **k6**
 
+Certifique de ter **Chocolatey** instalado em sua máquina e execute o comando para instalação do K6: 
+```bash
+choco install k6
+````
+
 Exemplo de execução:
 
 ```bash
@@ -215,3 +220,4 @@ No Telegram:
 
 
 ---
+
