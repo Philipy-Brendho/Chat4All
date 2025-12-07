@@ -1,0 +1,254 @@
+{
+  "id": null,
+  "uid": "chat4all-main",
+  "title": "Chat4All - API & Upload",
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 1,
+  "style": "dark",
+  "editable": true,
+  "panels": [
+    {
+      "type": "row",
+      "title": "Visão geral",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1
+    },
+    {
+      "id": 2,
+      "title": "Requisições/s (todas as rotas)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m]))",
+          "legendFormat": "req/s",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Erros 4xx/5xx (req/s)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"4..\"}[1m]))",
+          "legendFormat": "4xx",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m]))",
+          "legendFormat": "5xx",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Requisições por handler (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m])) by (handler)",
+          "legendFormat": "{{handler}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right" }
+      }
+    },
+    {
+      "type": "row",
+      "title": "Latência",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 5
+    },
+    {
+      "id": 6,
+      "title": "Latência média por handler (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "1000 * (sum(rate(http_request_duration_seconds_sum[1m])) by (handler) / sum(rate(http_request_duration_seconds_count[1m])) by (handler))",
+          "legendFormat": "{{handler}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right" }
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "title": "Latência p95 por handler (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, handler))",
+          "legendFormat": "{{handler}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right" }
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" },
+        "overrides": []
+      }
+    },
+    {
+      "type": "row",
+      "title": "Endpoints principais",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "id": 8
+    },
+    {
+      "id": 9,
+      "title": "/login - taxa de requisições (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 19 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/login\"}[1m]))",
+          "legendFormat": "/login",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "/v1/messages - req/s por status",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 19 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/v1/messages\"}[1m])) by (status)",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "/v1/messages - latência p95 (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 19 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{handler=\"/v1/messages\"}[5m])) by (le))",
+          "legendFormat": "p95",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms" },
+        "overrides": []
+      }
+    },
+    {
+      "type": "row",
+      "title": "Upload multipart",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "id": 12
+    },
+    {
+      "id": 13,
+      "title": "Uploads iniciados (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 26 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/v1/files/multipart/initiate\"}[1m]))",
+          "legendFormat": "initiate",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Chunks enviados (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 26 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/v1/files/multipart/{upload_id}/chunk\"}[1m]))",
+          "legendFormat": "chunk",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Uploads concluídos (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 26 },
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/v1/files/multipart/{upload_id}/complete\"}[1m]))",
+          "legendFormat": "complete",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {
+          "text": "Prometheus",
+          "value": "Prometheus"
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+  }
+}

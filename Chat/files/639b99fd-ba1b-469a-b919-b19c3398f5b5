@@ -1,0 +1,10 @@
+grpcio
+grpcio-tools
+fastapi
+uvicorn
+kafka-python
+cassandra-driver
+httpx
+PyJWT
+python-multipart 
+requests

@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package chat;
+
+import "google/protobuf/empty.proto";
+
+// --------------------- AUTENTICAÇÃO ----------------------
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    bool ok = 1;
+    string token = 2;
+    string message = 3;
+}
+
+// --------------------- PAYLOAD ---------------------------
+
+message MessagePayload {
+    string type = 1;    // "text", "file", etc.
+    string text = 2;
+    string file_id = 3; // se for arquivo
+}
+
+// --------------------- ENVIO DE MENSAGEM ------------------
+
+message SendMessageRequest {
+    string from = 1;                 // ignorado pelo servidor; servidor usa JWT
+    repeated string to = 2;          // alvo(s)
+    repeated string channels = 3;    // ["internal"], ["whatsapp"], ["instagram"]
+    MessagePayload payload = 4;
+    string message_id = 5;
+    string conversation_id = 6;
+}
+
+message Ack {
+    bool ok = 1;
+    string message = 2;
+}
+
+// ---------------------- EVENTOS DO STREAM -----------------
+
+// evento privado
+message PrivateMessageEvent {
+    string sender = 1;
+    string target = 2;
+    string content = 3;
+}
+
+// evento de grupo
+message GroupMessageEvent {
+    string sender = 1;
+    string group = 2;
+    string content = 3;
+}
+
+// evento de sistema
+message SystemEvent {
+    string content = 1;
+}
+
+// evento unificado
+message Event {
+    oneof event {
+        PrivateMessageEvent private_msg = 1;
+        GroupMessageEvent group_msg = 2;
+        SystemEvent system = 3;
+    }
+}
+
+message StreamRequest {
+    string username = 1;
+}
+
+// ----------------------- GRUPOS ----------------------------
+
+message CreateGroupRequest {
+    string creator = 1;
+    string group = 2;
+}
+
+message JoinGroupRequest {
+    string username = 1;
+    string group = 2;
+}
+
+message GroupListResponse {
+    repeated string groups = 1;
+}
+
+message OnlineUsersResponse {
+    repeated string usernames = 1;
+}
+
+// ---------------------- SERVIÇO ----------------------------
+
+service Chat {
+    rpc Login(LoginRequest) returns (LoginResponse);
+    rpc SendMessage(SendMessageRequest) returns (Ack);
+    rpc StreamMessages(StreamRequest) returns (stream Event);
+
+    rpc CreateGroup(CreateGroupRequest) returns (Ack);
+    rpc JoinGroup(JoinGroupRequest) returns (Ack);
+    rpc ListGroups(google.protobuf.Empty) returns (GroupListResponse);
+
+    rpc ListOnlineUsers(google.protobuf.Empty) returns (OnlineUsersResponse);
+}
